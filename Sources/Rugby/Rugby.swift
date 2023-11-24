@@ -47,7 +47,7 @@ struct Rugby: AsyncParsableCommand {
             Doctor.self,
             Shell.self,
             Env.self,
-            Analyse.self,
+            Analyse.self
         ],
         defaultSubcommand: Shortcuts.self
     )
