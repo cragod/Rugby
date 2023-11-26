@@ -21,6 +21,9 @@ struct Use: AsyncParsableCommand {
     @OptionGroup
     var commonOptions: CommonOptions
 
+    @Flag(name: .long, help: "Ignore binaries for dependencies.")
+    var ignoreDependencies = false
+
     func run() async throws {
         try await run(body,
                       outputType: commonOptions.output,
@@ -43,7 +46,8 @@ extension Use: RunnableCommand {
                     exactMatches: targetsOptions.exceptTargets
                 ),
                 xcargs: dependencies.xcargsProvider.xcargs(strip: additionalBuildOptions.strip),
-                deleteSources: deleteSources
+                deleteSources: deleteSources,
+                recursively: !ignoreDependencies
             )
     }
 }

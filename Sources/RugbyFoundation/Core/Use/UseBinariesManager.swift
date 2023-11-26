@@ -10,10 +10,12 @@ public protocol IUseBinariesManager {
     ///   - exceptTargetsRegex: A RegEx to exclude targets.
     ///   - xcargs: The xcargs which is used in Rugby.
     ///   - deleteSources: An option to delete targets with sources from Xcode project.
+    ///   - recursively: An option to recursively use binaries for dependencies.
     func use(targetsRegex: NSRegularExpression?,
              exceptTargetsRegex: NSRegularExpression?,
              xcargs: [String],
-             deleteSources: Bool) async throws
+             deleteSources: Bool,
+             recursively: Bool) async throws
 
     /// Uses built binaries instead of targets without saving the project.
     /// - Parameters:
@@ -141,11 +143,16 @@ extension UseBinariesManager: IUseBinariesManager {
     public func use(targetsRegex: NSRegularExpression?,
                     exceptTargetsRegex: NSRegularExpression?,
                     xcargs: [String],
-                    deleteSources: Bool) async throws {
+                    deleteSources: Bool,
+                    recursively: Bool = true) async throws {
         guard try await !rugbyXcodeProject.isAlreadyUsingRugby() else { throw RugbyError.alreadyUseRugby }
         let binaryTargets = try await log(
             "Finding Build Targets",
-            auto: await buildTargetsManager.findTargets(targetsRegex, exceptTargets: exceptTargetsRegex)
+            auto: await buildTargetsManager.findTargets(
+                targetsRegex,
+                exceptTargets: exceptTargetsRegex,
+                includingDependencies: recursively
+            )
         )
         try await log("Backuping", level: .info, auto: await backupManager.backup(xcodeProject, kind: .original))
         try await librariesPatcher.patch(binaryTargets)

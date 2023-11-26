@@ -131,7 +131,9 @@ extension BuildManager: IInternalBuildManager {
 
         let targets = try await log(
             "Finding Build Targets",
-            auto: await buildTargetsManager.findTargets(targetsRegex, exceptTargets: exceptTargetsRegex)
+            auto: await buildTargetsManager.findTargets(targetsRegex,
+                                                        exceptTargets: exceptTargetsRegex,
+                                                        includingDependencies: true)
         )
         guard targets.isNotEmpty else { throw BuildError.cantFindBuildTargets }
 

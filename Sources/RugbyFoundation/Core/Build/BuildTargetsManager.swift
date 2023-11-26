@@ -9,11 +9,12 @@ final class BuildTargetsManager {
     }
 
     func findTargets(_ targets: NSRegularExpression?,
-                     exceptTargets: NSRegularExpression?) async throws -> TargetsMap {
+                     exceptTargets: NSRegularExpression?,
+                     includingDependencies: Bool) async throws -> TargetsMap {
         try await xcodeProject.findTargets(
             by: targets,
             except: exceptTargets,
-            includingDependencies: true
+            includingDependencies: includingDependencies
         ).filter { _, target in
             target.isNative && !target.isTests && !target.isPodsUmbrella
         }
